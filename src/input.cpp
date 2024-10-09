@@ -781,15 +781,15 @@ namespace input {
     uint8_t synthetic_modifiers = 0;
     if (!release && !is_modifier(mappedKeyCode)) {
       // Apply only remapped modifiers dynamically
-      if (!is_modifier_active(input->shortcutFlags, MODIFIER_SHIFT) && (remappedModifiers & MODIFIER_SHIFT)) {
+      if (!(input->shortcutFlags & input_t::SHIFT) && (remappedModifiers & MODIFIER_SHIFT)) {
         synthetic_modifiers |= MODIFIER_SHIFT;
       }
 
-      if (!is_modifier_active(input->shortcutFlags, MODIFIER_CTRL) && (remappedModifiers & MODIFIER_CTRL)) {
+      if (!(input->shortcutFlags & input_t::CTRL) && (remappedModifiers & MODIFIER_CTRL)) {
         synthetic_modifiers |= MODIFIER_CTRL;
       }
 
-      if (!is_modifier_active(input->shortcutFlags, MODIFIER_ALT) && (remappedModifiers & MODIFIER_ALT)) {
+      if (!(input->shortcutFlags & input_t::ALT) && (remappedModifiers & MODIFIER_ALT)) {
         synthetic_modifiers |= MODIFIER_ALT;
       }
     }
