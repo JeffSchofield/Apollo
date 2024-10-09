@@ -933,7 +933,7 @@ namespace config {
       auto key = list[x++];
       auto val = list[x++];
 
-      input.emplace(key, val);
+      input.insert_or_assign(key, val);
     }
   }
 
