@@ -500,19 +500,22 @@ namespace config {
   template <class It>
   It
   skip_list(It skipper, It end) {
-    int stack = 1;
-    while (skipper != end && stack) {
-      if (*skipper == '[') {
-        ++stack;
+      int stack = 1;
+      while (skipper != end) {
+          if (*skipper == '[') {
+              ++stack;
+          }
+          if (*skipper == ']') {
+              --stack;
+              if (stack == 0) {
+                  break;  // Stop here since we've found the matching closing bracket
+              }
+          }
+          
+          ++skipper;
       }
-      if (*skipper == ']') {
-        --stack;
-      }
-
-      ++skipper;
-    }
-
-    return skipper;
+      
+      return skipper;
   }
 
   std::pair<
