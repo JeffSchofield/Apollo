@@ -285,17 +285,26 @@ const KeyCodeMap kKeyCodesMap[] = {
       else {
         macos_input->kb_flags |= mask;
       }
-
-      CGEventSetType(event, kCGEventFlagsChanged);
-      CGEventSetFlags(event, macos_input->kb_flags);
-    }
-    else {
-      CGEventSetIntegerValueField(event, kCGKeyboardEventKeycode, key);
-      CGEventSetType(event, release ? kCGEventKeyUp : kCGEventKeyDown);
-      CGEventSetFlags(event, macos_input->kb_flags);
     }
 
-    CGEventPost(kCGHIDEventTap, event);
+    // Create a new event for each key press or release
+    CGEventRef keyEvent = CGEventCreateKeyboardEvent(macos_input->source, key, !release);
+    CGEventSetFlags(keyEvent, macos_input->kb_flags);
+
+    // Post the event
+    CGEventPost(kCGHIDEventTap, keyEvent);
+
+    // Release the event
+    CFRelease(keyEvent);
+
+    // If it's a modifier key, we need to send a flags changed event as well
+    if (modifier_index != -1) {
+      CGEventRef flagsEvent = CGEventCreate(macos_input->source);
+      CGEventSetType(flagsEvent, kCGEventFlagsChanged);
+      CGEventSetFlags(flagsEvent, macos_input->kb_flags);
+      CGEventPost(kCGHIDEventTap, flagsEvent);
+      CFRelease(flagsEvent);
+    }
   }
 
   void
@@ -361,7 +370,7 @@ const KeyCodeMap kKeyCodesMap[] = {
     CGEventSetIntegerValueField(event, kCGMouseEventButtonNumber, button);
     CGEventSetIntegerValueField(event, kCGMouseEventClickState, click_count);
 
-    // Include deltas so some 3D applications can consume changes (game cameras, etc)
+  // Include deltas so some 3D applications can consume changes (game cameras, etc)
     const double deltaX = raw_location.x - previous_location.x;
     const double deltaY = raw_location.y - previous_location.y;
     CGEventSetDoubleValueField(event, kCGMouseEventDeltaX, deltaX);
