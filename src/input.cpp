@@ -744,6 +744,32 @@ namespace input {
     key_press_repeat_id = task_pool.pushDelayed(repeat_key, config::input.key_repeat_period, key_code, flags, synthetic_modifiers).task_id;
   }
 
+  // Function to get the appropriate modifier for a given key code dynamically
+  uint8_t
+  get_dynamic_modifier(uint16_t keyCode) {
+    for (const auto &[originalKey, mappedKey] : config::input.keybindings) {
+      if (mappedKey == keyCode) {
+        switch (originalKey) {
+          case 0x10:
+          case 0xA0:
+            return MODIFIER_SHIFT;  // Shift
+          case 0x11:
+          case 0xA2:
+            return MODIFIER_CTRL;  // Ctrl
+          case 0x12:
+          case 0xA4:
+            return MODIFIER_ALT;  // Alt
+          case 0x5B:
+          case 0x5C:
+            return MODIFIER_META;  // Win/Meta
+          default:
+            return 0;
+        }
+      }
+    }
+    return 0;
+  }
+
   uint8_t
   map_modifiers(uint8_t hardwareModifiers) {
     uint8_t mappedModifiers = 0;
