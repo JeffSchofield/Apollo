@@ -701,9 +701,7 @@ namespace input {
   }
 
 void
-send_key_and_modifiers(uint16_t key_code, bool release, uint8_t flags, uint8_t synthetic_modifiers) {
-  auto mappedKeyCode = map_keycode(key_code);
-  
+send_key_and_modifiers(uint16_t key_code, bool release, uint8_t flags, uint8_t synthetic_modifiers) {  
   if (!release) {
     // Press any synthetic modifiers required for this key
     if (synthetic_modifiers & MODIFIER_SHIFT) {
@@ -717,7 +715,7 @@ send_key_and_modifiers(uint16_t key_code, bool release, uint8_t flags, uint8_t s
     }
   }
 
-  platf::keyboard_update(platf_input, mappedKeyCode, release, flags);
+  platf::keyboard_update(platf_input, key_code, release, flags);
 
   if (!release) {
     // Raise any synthetic modifier keys we pressed
@@ -841,7 +839,7 @@ passthrough(std::shared_ptr<input_t> &input, PNV_KEYBOARD_PACKET packet) {
 
   pressed = !release;
 
-  send_key_and_modifiers(keyCode, release, packet->flags, synthetic_modifiers);
+  send_key_and_modifiers(mappedKeyCode, release, packet->flags, synthetic_modifiers);
 
   update_shortcutFlags(&input->shortcutFlags, mappedKeyCode, release);
   }
