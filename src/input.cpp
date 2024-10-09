@@ -707,13 +707,13 @@ send_key_and_modifiers(uint16_t key_code, bool release, uint8_t flags, uint8_t s
   if (!release) {
     // Press any synthetic modifiers required for this key
     if (synthetic_modifiers & MODIFIER_SHIFT) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_SHIFT), false, flags);
+      platf::keyboard_update(platf_input, VKEY_SHIFT, false, flags);
     }
     if (synthetic_modifiers & MODIFIER_CTRL) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_CONTROL), false, flags);
+      platf::keyboard_update(platf_input, VKEY_CONTROL, false, flags);
     }
     if (synthetic_modifiers & MODIFIER_ALT) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_MENU), false, flags);
+      platf::keyboard_update(platf_input, VKEY_MENU, false, flags);
     }
   }
 
@@ -722,13 +722,13 @@ send_key_and_modifiers(uint16_t key_code, bool release, uint8_t flags, uint8_t s
   if (!release) {
     // Raise any synthetic modifier keys we pressed
     if (synthetic_modifiers & MODIFIER_SHIFT) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_SHIFT), true, flags);
+      platf::keyboard_update(platf_input, VKEY_SHIFT, true, flags);
     }
     if (synthetic_modifiers & MODIFIER_CTRL) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_CONTROL), true, flags);
+      platf::keyboard_update(platf_input, VKEY_CONTROL, true, flags);
     }
     if (synthetic_modifiers & MODIFIER_ALT) {
-      platf::keyboard_update(platf_input, map_keycode(VKEY_MENU), true, flags);
+      platf::keyboard_update(platf_input, VKEY_MENU, true, flags);
     }
   }
 }
@@ -746,6 +746,46 @@ repeat_key(uint16_t key_code, uint8_t flags, uint8_t synthetic_modifiers) {
   key_press_repeat_id = task_pool.pushDelayed(repeat_key, config::input.key_repeat_period, key_code, flags, synthetic_modifiers).task_id;
 }
 
+uint8_t
+get_dynamic_modifier(uint16_t keyCode) {
+  switch (keyCode) {
+    case VKEY_SHIFT:
+    case VKEY_LSHIFT:
+    case VKEY_RSHIFT:
+      return MODIFIER_SHIFT;  // Shift
+    case VKEY_CONTROL:
+    case VKEY_LCONTROL:
+    case VKEY_RCONTROL:
+      return MODIFIER_CTRL;  // Ctrl
+    case VKEY_MENU:
+    case VKEY_LMENU:
+    case VKEY_RMENU:
+      return MODIFIER_ALT;  // Alt
+    default:
+      return 0;
+  }
+  return 0;
+}
+
+uint8_t
+map_modifiers(uint8_t modifiers) {
+  uint8_t mappedModifiers = 0;
+
+  // Loop through each keybinding to check if there is a mapping for the modifier key
+  for (const auto &[originalKey, mappedKey] : config::input.keybindings) {
+    if (modifiers & MODIFIER_SHIFT && (originalKey == VKEY_SHIFT || originalKey == VKEY_LSHIFT || originalKey == VKEY_RSHIFT)) {
+      mappedModifiers |= get_dynamic_modifier(mappedKey);
+    }
+    if (modifiers & MODIFIER_CTRL && (originalKey == VKEY_CONTROL || originalKey == VKEY_LCONTROL || originalKey == VKEY_RCONTROL)) {
+      mappedModifiers |= get_dynamic_modifier(mappedKey);
+    }
+    if (modifiers & MODIFIER_ALT && (originalKey == VKEY_MENU || originalKey == VKEY_LMENU || originalKey == VKEY_RMENU)) {
+      mappedModifiers |= get_dynamic_modifier(mappedKey);
+    }
+  }
+  return mappedModifiers;
+}
+
 void
 passthrough(std::shared_ptr<input_t> &input, PNV_KEYBOARD_PACKET packet) {
   if (!config::input.keyboard) {
@@ -755,18 +795,19 @@ passthrough(std::shared_ptr<input_t> &input, PNV_KEYBOARD_PACKET packet) {
   auto release = util::endian::little(packet->header.magic) == KEY_UP_EVENT_MAGIC;
   auto keyCode = packet->keyCode & 0x00FF;
   auto mappedKeyCode = map_keycode(keyCode);
+  auto mappedModifiers = map_modifiers(packet->modifiers);
 
   // Set synthetic modifier flags if the keyboard packet is requesting modifier
   // keys that are not current pressed.
   uint8_t synthetic_modifiers = 0;
   if (!release && !is_modifier(mappedKeyCode)) {
-    if (!(input->shortcutFlags & input_t::SHIFT) && (packet->modifiers & MODIFIER_SHIFT)) {
+    if (!(input->shortcutFlags & input_t::SHIFT) && (mappedModifiers & MODIFIER_SHIFT)) {
       synthetic_modifiers |= MODIFIER_SHIFT;
     }
-    if (!(input->shortcutFlags & input_t::CTRL) && (packet->modifiers & MODIFIER_CTRL)) {
+    if (!(input->shortcutFlags & input_t::CTRL) && (mappedModifiers & MODIFIER_CTRL)) {
       synthetic_modifiers |= MODIFIER_CTRL;
     }
-    if (!(input->shortcutFlags & input_t::ALT) && (packet->modifiers & MODIFIER_ALT)) {
+    if (!(input->shortcutFlags & input_t::ALT) && (mappedModifiers & MODIFIER_ALT)) {
       synthetic_modifiers |= MODIFIER_ALT;
     }
   }
