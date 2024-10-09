@@ -1316,6 +1316,13 @@ namespace config {
       // the path is incorrect or inaccessible.
       apply_config(std::move(vars));
       config_loaded = true;
+
+      if (sunshine.min_log_level <= 3) {
+        std::cout << "Config loaded successfully"sv << std::endl;
+        for (const auto &entry : config::input.keybindings) {
+            std::cout << "Keybinding: " << entry.first << " -> " << entry.second << std::endl;
+        }
+      }
     }
     catch (const std::filesystem::filesystem_error &err) {
       BOOST_LOG(fatal) << "Failed to apply config: "sv << err.what();
