@@ -632,10 +632,14 @@ namespace input {
   short
   map_keycode(short keycode) {
     auto it = config::input.keybindings.find(keycode);
+    BOOST_LOG(debug) << "Mapping keycode: 0x"sv << util::hex((std::uint8_t) keycode).to_string_view();
+
     if (it != std::end(config::input.keybindings)) {
+      BOOST_LOG(debug) << "Mapped keycode to: 0x"sv << util::hex((std::uint8_t) it->second).to_string_view();
       return it->second;
     }
 
+    BOOST_LOG(debug) << "Mapped keycode to: 0x"sv << util::hex((std::uint8_t) keycode).to_string_view();
     return keycode;
   }
 
