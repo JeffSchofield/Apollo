@@ -35,6 +35,7 @@ namespace platf {
     // keyboard related stuff
     CGEventRef kb_event {};
     CGEventFlags kb_flags {};
+    bool modifier_state[4] {}; // Track state of Shift, Command, Option, Control
 
     // mouse related stuff
     CGEventRef mouse_event {};  // mouse event source
@@ -255,38 +256,43 @@ const KeyCodeMap kKeyCodesMap[] = {
     auto macos_input = ((macos_input_t *) input.get());
     auto event = macos_input->kb_event;
 
-    if (key == kVK_Shift || key == kVK_RightShift ||
-        key == kVK_Command || key == kVK_RightCommand ||
-        key == kVK_Option || key == kVK_RightOption ||
-        key == kVK_Control || key == kVK_RightControl) {
-      CGEventFlags mask;
+    CGEventFlags mask = 0;
+    int modifier_index = -1;
 
-      switch (key) {
-        case kVK_Shift:
-        case kVK_RightShift:
-          mask = kCGEventFlagMaskShift;
-          break;
-        case kVK_Command:
-        case kVK_RightCommand:
-          mask = kCGEventFlagMaskCommand;
-          break;
-        case kVK_Option:
-        case kVK_RightOption:
-          mask = kCGEventFlagMaskAlternate;
-          break;
-        case kVK_Control:
-        case kVK_RightControl:
-          mask = kCGEventFlagMaskControl;
-          break;
+    if (key == kVK_Shift || key == kVK_RightShift) {
+      mask = kCGEventFlagMaskShift;
+      modifier_index = 0;
+    }
+    else if (key == kVK_Command || key == kVK_RightCommand) {
+      mask = kCGEventFlagMaskCommand;
+      modifier_index = 1;
+    }
+    else if (key == kVK_Option || key == kVK_RightOption) {
+      mask = kCGEventFlagMaskAlternate;
+      modifier_index = 2;
+    }
+    else if (key == kVK_Control || key == kVK_RightControl) {
+      mask = kCGEventFlagMaskControl;
+      modifier_index = 3;
+    }
+
+    if (modifier_index != -1) {
+      macos_input->modifier_state[modifier_index] = !release;
+      
+      if (release) {
+        macos_input->kb_flags &= ~mask;
+      }
+      else {
+        macos_input->kb_flags |= mask;
       }
 
-      macos_input->kb_flags = release ? macos_input->kb_flags & ~mask : macos_input->kb_flags | mask;
       CGEventSetType(event, kCGEventFlagsChanged);
       CGEventSetFlags(event, macos_input->kb_flags);
     }
     else {
       CGEventSetIntegerValueField(event, kCGKeyboardEventKeycode, key);
       CGEventSetType(event, release ? kCGEventKeyUp : kCGEventKeyDown);
+      CGEventSetFlags(event, macos_input->kb_flags);
     }
 
     CGEventPost(kCGHIDEventTap, event);
