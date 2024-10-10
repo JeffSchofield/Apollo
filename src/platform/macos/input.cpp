@@ -285,10 +285,10 @@ const KeyCodeMap kKeyCodesMap[] = {
       CGEventSetFlags(event, macos_input->kb_flags);
     }
     else {
-      CGEventSetIntegerValueField(event, kCGKeyboardEventKeycode, key);
       CGEventSetType(event, release ? kCGEventKeyUp : kCGEventKeyDown);
     }
 
+    CGEventSetIntegerValueField(event, kCGKeyboardEventKeycode, key);
     CGEventPost(kCGHIDEventTap, event);
   }
 
