@@ -1308,6 +1308,11 @@ namespace video {
             // Refresh display names since a display removal might have caused the reinitialization
             refresh_displays(encoder.platform_formats->dev_type, display_names, display_p, proc::proc.display_name);
 
+            // Loop through each display_name and debug log both the index and the name
+            for (size_t i = 0; i < display_names.size(); i++) {
+              BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
+            }
+
             // Process any pending display switch with the new list of displays
             if (switch_display_event->peek()) {
               display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
@@ -2067,6 +2072,11 @@ namespace video {
     while (encode_session_ctx_queue.running()) {
       // Refresh display names since a display removal might have caused the reinitialization
       refresh_displays(encoder.platform_formats->dev_type, display_names, display_p);
+
+      // Loop through each display_name and debug log both the index and the name
+      for (size_t i = 0; i < display_names.size(); i++) {
+        BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
+      }
 
       // Process any pending display switch with the new list of displays
       if (switch_display_event->peek()) {
