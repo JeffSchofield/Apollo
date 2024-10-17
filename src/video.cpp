@@ -1315,6 +1315,8 @@ namespace video {
               BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
             }
 
+            BOOST_LOG(debug) << "Switch display event peek: "sv << (bool) switch_display_event->peek();
+
             // Process any pending display switch with the new list of displays
             if (switch_display_event->peek()) {
               display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
@@ -2082,6 +2084,8 @@ namespace video {
       for (size_t i = 0; i < display_names.size(); i++) {
         BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
       }
+
+      BOOST_LOG(debug) << "Switch display event peek: "sv << (bool) switch_display_event->peek();
 
       // Process any pending display switch with the new list of displays
       if (switch_display_event->peek()) {

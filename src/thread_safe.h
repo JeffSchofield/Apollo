@@ -134,8 +134,6 @@ namespace safe {
 
     bool
     peek() {
-      // Logging the peek event attempt
-      std::cout << "Peeking event, currently status is: " << (bool) _status;
       return _continue && (bool) _status;
     }
 
