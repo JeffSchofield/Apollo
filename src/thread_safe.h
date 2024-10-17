@@ -21,6 +21,9 @@ namespace safe {
   public:
     using status_t = util::optional_t<T>;
 
+    // Constructor to include a name for logging
+    explicit event_t(const std::string &event_name) : _name(event_name) {}
+
     template <class... Args>
     void
     raise(Args &&...args) {
@@ -30,7 +33,7 @@ namespace safe {
       }
 
       // Logging the raise event and its value
-      std::cout << "Raising event.";
+      std::cout << "Raising event: " << _name << ".";
 
       if constexpr (std::is_same_v<std::optional<T>, status_t>) {
         _status = std::make_optional<T>(std::forward<Args>(args)...);
@@ -88,7 +91,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the pop event and its value
-      std::cout << "Popping event.";
+      std::cout << "Popping event: " << _name << ".";
       
       return val;
     }
@@ -144,7 +147,7 @@ namespace safe {
       _continue = false;
 
       // Logging the stop event operation
-      std::cout << "Stopping event.";
+      std::cout << "Stopping event: " << _name << ".";
 
       _cv.notify_all();
     }
@@ -158,7 +161,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the reset event operation
-      std::cout << "Resetting event.";
+      std::cout << "Resetting event: " << _name << ".";
     }
 
     [[nodiscard]] bool
@@ -167,6 +170,7 @@ namespace safe {
     }
 
   private:
+    std::string _name;  // Identifier for the event
     bool _continue { true };
     status_t _status { util::false_v<status_t> };
 
@@ -546,7 +550,7 @@ namespace safe {
         return lock<event_t<T>>(it->second);
       }
 
-      auto post = std::make_shared<typename event_t<T>::element_type>(shared_from_this());
+      auto post = std::make_shared<post_t<event_t<T>>>(shared_from_this(), std::string(id));
       id_to_post.emplace(std::pair<std::string, std::weak_ptr<void>> { std::string { id }, post });
 
       return post;
@@ -562,7 +566,7 @@ namespace safe {
         return lock<queue_t<T>>(it->second);
       }
 
-      auto post = std::make_shared<typename queue_t<T>::element_type>(shared_from_this(), 32);
+      auto post = std::make_shared<post_t<queue_t<T>>>(shared_from_this(), 32, std::string(id));
       id_to_post.emplace(std::pair<std::string, std::weak_ptr<void>> { std::string { id }, post });
 
       return post;
