@@ -20,6 +20,9 @@ namespace safe {
   class event_t {
   public:
     using status_t = util::optional_t<T>;
+    void set_name(const std::string& name) {
+        _name = name;
+    }
 
     template <class... Args>
     void
@@ -179,9 +182,6 @@ namespace safe {
   class alarm_raw_t {
   public:
     using status_t = util::optional_t<T>;
-    void set_name(const std::string& name) {
-        _name = name;
-    }
 
     void
     ring(const status_t &status) {
