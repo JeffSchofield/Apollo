@@ -4,7 +4,6 @@
  */
 #pragma once
 
-#include <iostream>
 #include <array>
 #include <atomic>
 #include <condition_variable>
@@ -33,7 +32,7 @@ namespace safe {
       }
 
       // Logging the raise event and its value
-      std::cout << "Raising event: " << _name << ".";
+      BOOST_LOG(debug) << "Raising event: " << _name << ".";
 
       if constexpr (std::is_same_v<std::optional<T>, status_t>) {
         _status = std::make_optional<T>(std::forward<Args>(args)...);
@@ -66,7 +65,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the pop event and its value
-      std::cout << "Popping event.";
+      BOOST_LOG(debug) << "Popping event: " << _name << ".";
 
       return val;
     }
@@ -91,7 +90,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the pop event and its value
-      std::cout << "Popping event: " << _name << ".";
+      BOOST_LOG(debug) << "Popping event: " << _name << ".";
       
       return val;
     }
@@ -147,7 +146,7 @@ namespace safe {
       _continue = false;
 
       // Logging the stop event operation
-      std::cout << "Stopping event: " << _name << ".";
+      BOOST_LOG(debug) << "Stopping event: " << _name << ".";
 
       _cv.notify_all();
     }
@@ -161,7 +160,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the reset event operation
-      std::cout << "Resetting event: " << _name << ".";
+      BOOST_LOG(debug) << "Resetting event: " << _name << ".";
     }
 
     [[nodiscard]] bool
