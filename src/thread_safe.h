@@ -29,7 +29,7 @@ namespace safe {
       }
 
       // Logging the raise event and its value
-      BOOST_LOG(debug) << "Raising event with value: " << (... << args);
+      BOOST_LOG(debug) << "Raising event."sv;
 
       if constexpr (std::is_same_v<std::optional<T>, status_t>) {
         _status = std::make_optional<T>(std::forward<Args>(args)...);
@@ -62,7 +62,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the pop event and its value
-      BOOST_LOG(debug) << "Popping event with value: " << val;
+      BOOST_LOG(debug) << "Popping event."sv;
 
       return val;
     }
@@ -87,7 +87,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the pop event and its value
-      BOOST_LOG(debug) << "Popping event with value: " << val;
+      BOOST_LOG(debug) << "Popping event."sv;
       
       return val;
     }
@@ -134,7 +134,7 @@ namespace safe {
     bool
     peek() {
       // Logging the peek event attempt
-      BOOST_LOG(debug) << "Peeking event, currently status is: " << (bool)_status;
+      BOOST_LOG(debug) << "Peeking event, currently status is: "sv << (bool) _status;
       return _continue && (bool) _status;
     }
 
@@ -145,7 +145,7 @@ namespace safe {
       _continue = false;
 
       // Logging the stop event operation
-      BOOST_LOG(debug) << "Stopping event.";
+      BOOST_LOG(debug) << "Stopping event."sv;
 
       _cv.notify_all();
     }
@@ -159,7 +159,7 @@ namespace safe {
       _status = util::false_v<status_t>;
 
       // Logging the reset event operation
-      BOOST_LOG(debug) << "Resetting event.";
+      BOOST_LOG(debug) << "Resetting event."sv;
     }
 
     [[nodiscard]] bool
