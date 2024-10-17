@@ -566,7 +566,7 @@ namespace safe {
         return lock<queue_t<T>>(it->second);
       }
 
-      auto post = std::make_shared<post_t<queue_t<T>>>(shared_from_this(), 32, std::string(id));
+      auto post = std::make_shared<post_t<queue_t<T>>>(shared_from_this(), 32);
       id_to_post.emplace(std::pair<std::string, std::weak_ptr<void>> { std::string { id }, post });
 
       return post;
