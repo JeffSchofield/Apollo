@@ -1311,6 +1311,7 @@ namespace video {
             // Process any pending display switch with the new list of displays
             if (switch_display_event->peek()) {
               display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
+              BOOST_LOG(debug) << "Switching to display ["sv << display_names[display_p] << ']' << std::endl;
             }
 
             // reset_display() will sleep between retries
@@ -2071,6 +2072,7 @@ namespace video {
       // Process any pending display switch with the new list of displays
       if (switch_display_event->peek()) {
         display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
+        BOOST_LOG(debug) << "Switching to display ["sv << display_names[display_p] << ']' << std::endl;
       }
 
       // reset_display() will sleep between retries

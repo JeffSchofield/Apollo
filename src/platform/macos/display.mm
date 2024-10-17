@@ -156,6 +156,8 @@ namespace platf {
       return nullptr;
     }
 
+    BOOST_LOG(debug) << "Setting up display capture for display name: "sv << display_name << " and hw device type: "sv << hwdevice_type;
+
     auto display = std::make_shared<av_display_t>();
 
     // Default to main display
