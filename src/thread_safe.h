@@ -28,6 +28,9 @@ namespace safe {
         return;
       }
 
+      // Logging the raise event and its value
+      BOOST_LOG(debug) << "Raising event with value: " << (... << args);
+
       if constexpr (std::is_same_v<std::optional<T>, status_t>) {
         _status = std::make_optional<T>(std::forward<Args>(args)...);
       }
@@ -57,6 +60,10 @@ namespace safe {
 
       auto val = std::move(_status);
       _status = util::false_v<status_t>;
+
+      // Logging the pop event and its value
+      BOOST_LOG(debug) << "Popping event with value: " << val;
+
       return val;
     }
 
@@ -78,6 +85,10 @@ namespace safe {
 
       auto val = std::move(_status);
       _status = util::false_v<status_t>;
+
+      // Logging the pop event and its value
+      BOOST_LOG(debug) << "Popping event with value: " << val;
+      
       return val;
     }
 
@@ -122,6 +133,8 @@ namespace safe {
 
     bool
     peek() {
+      // Logging the peek event attempt
+      BOOST_LOG(debug) << "Peeking event, currently status is: " << (bool)_status;
       return _continue && (bool) _status;
     }
 
@@ -130,6 +143,9 @@ namespace safe {
       std::lock_guard lg { _lock };
 
       _continue = false;
+
+      // Logging the stop event operation
+      BOOST_LOG(debug) << "Stopping event.";
 
       _cv.notify_all();
     }
@@ -141,6 +157,9 @@ namespace safe {
       _continue = true;
 
       _status = util::false_v<status_t>;
+
+      // Logging the reset event operation
+      BOOST_LOG(debug) << "Resetting event.";
     }
 
     [[nodiscard]] bool

@@ -4,7 +4,6 @@
  */
 #pragma once
 
-#include "globals.h"
 #include "input.h"
 #include "platform/common.h"
 #include "thread_safe.h"
