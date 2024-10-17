@@ -1308,6 +1308,8 @@ namespace video {
             // Refresh display names since a display removal might have caused the reinitialization
             refresh_displays(encoder.platform_formats->dev_type, display_names, display_p, proc::proc.display_name);
 
+            BOOST_LOG(debug) << "Current display "sv << display_p << ": "sv << display_names[display_p];
+
             // Loop through each display_name and debug log both the index and the name
             for (size_t i = 0; i < display_names.size(); i++) {
               BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
@@ -1316,6 +1318,7 @@ namespace video {
             // Process any pending display switch with the new list of displays
             if (switch_display_event->peek()) {
               display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
+              BOOST_LOG(debug) << "Switching to display "sv << display_p << ": "sv << display_names[display_p];
             }
 
             // reset_display() will sleep between retries
@@ -2073,6 +2076,8 @@ namespace video {
       // Refresh display names since a display removal might have caused the reinitialization
       refresh_displays(encoder.platform_formats->dev_type, display_names, display_p);
 
+      BOOST_LOG(debug) << "Current display "sv << display_p << ": "sv << display_names[display_p];
+      
       // Loop through each display_name and debug log both the index and the name
       for (size_t i = 0; i < display_names.size(); i++) {
         BOOST_LOG(debug) << "Display "sv << i << ": "sv << display_names[i];
@@ -2081,6 +2086,7 @@ namespace video {
       // Process any pending display switch with the new list of displays
       if (switch_display_event->peek()) {
         display_p = std::clamp(*switch_display_event->pop(), 0, (int) display_names.size() - 1);
+        BOOST_LOG(debug) << "Switch to display "sv << display_p << ": "sv << display_names[display_p];
       }
 
       // reset_display() will sleep between retries
