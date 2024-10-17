@@ -202,7 +202,7 @@ namespace input {
     BOOST_LOG(debug) << "Apply Shortcut: 0x"sv << util::hex((std::uint8_t) keyCode).to_string_view();
 
     if (keyCode >= VK_F1 && keyCode <= VK_F13) {
-      BOOST_LOG(debug) << "Requesting display switch: "sv << keyCode - VK_F1;
+      BOOST_LOG(debug) << "Requesting display switch: " << std::string(keyCode - VK_F1);
       mail::man->event<int>(mail::switch_display)->raise(keyCode - VK_F1);
       return 1;
     }
