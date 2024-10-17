@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <iostream>
 #include <array>
 #include <atomic>
 #include <condition_variable>
