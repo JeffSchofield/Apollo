@@ -9,6 +9,7 @@
 #include "platform/common.h"
 #include "thread_safe.h"
 #include "crypto.h"
+#include "globals.h"
 
 namespace input {
   struct input_t;
