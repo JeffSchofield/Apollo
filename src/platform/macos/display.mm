@@ -172,7 +172,7 @@ namespace platf {
       NSString *name = item[@"displayName"];
       // We are using CGGetActiveDisplayList that only returns active displays so hardcoded connected value in log to true
       BOOST_LOG(info) << "Detected display: "sv << name.UTF8String << " (id: "sv << [NSString stringWithFormat:@"%@", display_id].UTF8String << ") connected: true"sv;
-      if (!display_name.empty() && std::atoi(display_name.c_str()) == [display_id unsignedIntValue]) {
+      if (!display_name.empty() && std::atoi(display_name.c_str()) == std::atoi([name UTF8String])) {
         display->display_id = [display_id unsignedIntValue];
       }
     }
