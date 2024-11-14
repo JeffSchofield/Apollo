@@ -403,7 +403,6 @@ namespace config {
     APPS_JSON_PATH,
 
     20,  // fecPercentage
-    1,  // channels
 
     ENCRYPTION_MODE_NEVER,  // lan_encryption_mode
     ENCRYPTION_MODE_OPPORTUNISTIC,  // wan_encryption_mode
@@ -987,7 +986,7 @@ namespace config {
 
     for (auto &[name, val] : vars) {
     #ifdef _WIN32
-      std::cout << "["sv << name << "] -- ["sv << convertUtf8ToCurrentCodepage(val) << ']' << std::endl;
+      std::cout << "["sv << name << "] -- ["sv << utf8ToAcp(val) << ']' << std::endl;
     #else
       std::cout << "["sv << name << "] -- ["sv << val << ']' << std::endl;
     #endif
@@ -1011,6 +1010,7 @@ namespace config {
     bool_f(vars, "nvenc_spatial_aq", video.nv.adaptive_quantization);
     generic_f(vars, "nvenc_twopass", video.nv.two_pass, nv::twopass_from_view);
     bool_f(vars, "nvenc_h264_cavlc", video.nv.h264_cavlc);
+    bool_f(vars, "nvenc_intra_refresh", video.nv.intra_refresh);
     bool_f(vars, "nvenc_realtime_hags", video.nv_realtime_hags);
     bool_f(vars, "nvenc_opengl_vulkan_on_dxgi", video.nv_opengl_vulkan_on_dxgi);
     bool_f(vars, "nvenc_latency_over_power", video.nv_sunshine_high_power_mode);
@@ -1097,8 +1097,6 @@ namespace config {
     if (to != -1) {
       stream.ping_timeout = std::chrono::milliseconds(to);
     }
-
-    int_between_f(vars, "channels", stream.channels, { 1, std::numeric_limits<int>::max() });
 
     int_between_f(vars, "lan_encryption_mode", stream.lan_encryption_mode, { 0, 2 });
     int_between_f(vars, "wan_encryption_mode", stream.wan_encryption_mode, { 0, 2 });

@@ -514,6 +514,7 @@ namespace video {
         { "forced-idr"s, 1 },
         { "zerolatency"s, 1 },
         { "surfaces"s, 1 },
+        { "filler_data"s, false },
         { "preset"s, &config::video.nv_legacy.preset },
         { "tune"s, NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY },
         { "rc"s, NV_ENC_PARAMS_RC_CBR },
@@ -1880,7 +1881,14 @@ namespace video {
     }
 
     while (true) {
-      if (shutdown_event->peek() || reinit_event.peek() || !images->running()) {
+      // Break out of the encoding loop if any of the following are true:
+      // a) The stream is ending
+      // b) Sunshine is quitting
+      // c) The capture side is waiting to reinit and we've encoded at least one frame
+      //
+      // If we have to reinit before we have received any captured frames, we will encode
+      // the blank dummy frame just to let Moonlight know that we're alive.
+      if (shutdown_event->peek() || !images->running() || (reinit_event.peek() && frame_nr > 1)) {
         break;
       }
 

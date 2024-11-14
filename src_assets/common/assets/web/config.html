@@ -219,7 +219,6 @@
             id: "advanced",
             name: "Advanced",
             options: {
-              "channels": 1,
               "fec_percentage": 20,
               "qp": 28,
               "min_threads": 2,
@@ -241,6 +240,7 @@
               "nvenc_latency_over_power": "enabled",
               "nvenc_opengl_vulkan_on_dxgi": "enabled",
               "nvenc_h264_cavlc": "disabled",
+              "nvenc_intra_refresh": "disabled"
             },
           },
           {
@@ -291,7 +291,7 @@
        }
     },
     created() {
-      fetch("/api/config", {
+      fetch("./api/config", {
         credentials: 'include'
       })
         .then((r) => r.json())
@@ -393,7 +393,7 @@
           });
         });
 
-        return fetch("/api/config", {
+        return fetch("./api/config", {
           credentials: 'include',
           method: "POST",
           body: JSON.stringify(config),
@@ -417,7 +417,7 @@
             setTimeout(() => {
               this.saved = this.restarted = false;
             }, 5000);
-            fetch("/api/restart", {
+            fetch("./api/restart", {
               method: "POST"
             })
             .then((resp) => {
